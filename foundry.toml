@@ -1,0 +1,33 @@
+[profile.default]
+src = "contracts/src"
+out = "contracts/out"
+libs = ["contracts/lib"]
+test = "contracts/test"
+script = "contracts/script"
+
+# Solidity compiler version
+solc_version = "0.8.20"
+
+# Optimizer settings
+optimizer = true
+optimizer_runs = 200
+
+# EVM version
+evm_version = "paris"
+
+# Remappings for dependencies
+remappings = [
+    "@openzeppelin/=contracts/lib/openzeppelin-contracts/",
+    "forge-std/=contracts/lib/forge-std/src/"
+]
+
+# Test settings
+verbosity = 3
+
+[rpc_endpoints]
+bsc_testnet = "https://data-seed-prebsc-1-s1.binance.org:8545"
+bsc_mainnet = "https://bsc-dataseed.binance.org"
+
+[etherscan]
+bsc_testnet = { key = "${BSCSCAN_API_KEY}", url = "https://api-testnet.bscscan.com/api" }
+bsc_mainnet = { key = "${BSCSCAN_API_KEY}", url = "https://api.bscscan.com/api" }
