@@ -204,14 +204,29 @@ const DAppHome = () => {
         <footer className="mt-16 pt-8 border-t">
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">
+              <a
+                href={`https://testnet.bscscan.com/address/${contractAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
                 合约地址
               </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                使用文档
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
+              <a
+                href="https://github.com/gududefengzhong"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
                 GitHub
+              </a>
+              <a
+                href="https://x.com/rochestor_mu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors"
+              >
+                X / Twitter
               </a>
             </div>
             <p className="text-sm text-muted-foreground">

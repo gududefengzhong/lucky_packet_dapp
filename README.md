@@ -2,7 +2,10 @@
 
 **BNB Hackathon 项目** - 使用 AI (Nora) 构建的链上红包应用
 
+[![Live Demo](https://img.shields.io/badge/Demo-Live-green)](https://luckypacket.vercel.app/)
 [![BSC Testnet](https://img.shields.io/badge/Network-BSC%20Testnet-yellow)](https://testnet.bscscan.com/address/0x62B8d5497CCf812A6d82Ef047F9bDae39e24bb03)
+
+🔗 **在线体验:** [https://luckypacket.vercel.app](https://luckypacket.vercel.app/)
 
 ## ✨ 功能特性
 
