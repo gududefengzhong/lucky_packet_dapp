@@ -205,7 +205,7 @@ const DAppHome = () => {
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
               <a
-                href={`https://testnet.bscscan.com/address/${contractAddress}`}
+                href={`https://testnet.bscscan.com/address/${CONTRACT_ADDRESS}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-foreground transition-colors"
