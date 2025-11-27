@@ -27,7 +27,7 @@ cache/
 contracts/out/
 contracts/cache/
 contracts/broadcast/
-
+broadcast/
 # IDE
 .vscode/
 .idea/
@@ -38,6 +38,4 @@ contracts/broadcast/
 # Typechain
 typechain/
 typechain-types/
-
-# ABIs
-src/contracts/abis/
+.vercel

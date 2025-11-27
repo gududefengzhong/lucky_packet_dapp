@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { parseEther } from 'viem';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Button } from './ui/button';
@@ -23,17 +23,53 @@ export function CreatePacketForm({ contractAddress, contractABI, onSuccess }: Cr
   const [message, setMessage] = useState('');
   const [isRandom, setIsRandom] = useState(true);
 
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { writeContract, data: hash, isPending, error, reset } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
+  // 使用 ref 来追踪已处理的 hash，避免重复触发 toast
+  const processedHashRef = useRef<string | null>(null);
+
+  // 使用 useCallback 确保 onSuccess 引用稳定
+  const stableOnSuccess = useCallback(() => {
+    onSuccess?.();
+  }, [onSuccess]);
+
+  // 使用 useEffect 处理交易成功的副作用
+  useEffect(() => {
+    // 只有当 hash 存在且未处理过时才触发
+    if (isSuccess && hash && processedHashRef.current !== hash) {
+      processedHashRef.current = hash; // 标记为已处理
+      toast.success('红包创建成功！🎉');
+      // 重置表单
+      setAmount('');
+      setCount('5');
+      setDuration('24');
+      setMessage('');
+      stableOnSuccess();
+      // 重置 writeContract 状态，以便下一次创建
+      reset();
+    }
+  }, [isSuccess, hash, stableOnSuccess, reset]);
+
+  // 使用 ref 追踪已处理的错误
+  const processedErrorRef = useRef<string | null>(null);
+
+  // 使用 useEffect 处理错误的副作用
+  useEffect(() => {
+    if (error && processedErrorRef.current !== error.message) {
+      processedErrorRef.current = error.message;
+      toast.error(`错误: ${error.message}`);
+    }
+  }, [error]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!amount || parseFloat(amount) <= 0) {
-      toast.error('请输入有效的金额');
+    if (!amount || parseFloat(amount) < 0.01) {
+      toast.error('红包金额最少 0.01 BNB');
       return;
     }
 
@@ -65,22 +101,6 @@ export function CreatePacketForm({ contractAddress, contractABI, onSuccess }: Cr
     }
   };
 
-  // 监听交易成功
-  if (isSuccess && !isConfirming) {
-    toast.success('红包创建成功！🎉');
-    // 重置表单
-    setAmount('');
-    setCount('5');
-    setDuration('24');
-    setMessage('');
-    onSuccess?.();
-  }
-
-  // 监听错误
-  if (error) {
-    toast.error(`错误: ${error.message}`);
-  }
-
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
@@ -100,7 +120,8 @@ export function CreatePacketForm({ contractAddress, contractABI, onSuccess }: Cr
             <Input
               id="amount"
               type="number"
-              step="0.001"
+              step="0.01"
+              min="0.01"
               placeholder="0.1"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -108,7 +129,7 @@ export function CreatePacketForm({ contractAddress, contractABI, onSuccess }: Cr
               disabled={isPending || isConfirming}
             />
             <p className="text-sm text-muted-foreground">
-              实际金额将扣除 1% 平台手续费
+              最少 0.01 BNB，实际金额将扣除 1% 平台手续费
             </p>
           </div>
 

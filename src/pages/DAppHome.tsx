@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { CreatePacketForm } from '@/components/CreatePacketForm';
@@ -7,27 +7,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Gift, List, PlusCircle, Info } from 'lucide-react';
-import { Toaster } from 'sonner';
+import LuckyPacketABI from '@/contracts/abis/LuckyPacket.json';
 
-// TODO: 部署合约后，替换为实际的合约地址
+// 合约地址从环境变量读取
 const CONTRACT_ADDRESS = import.meta.env.VITE_LUCKY_PACKET_CONTRACT_ADDRESS as `0x${string}` || '0x0000000000000000000000000000000000000000';
 
-// TODO: 编译合约后，从 src/contracts/abis/LuckyPacket.json 导入
-const CONTRACT_ABI = [] as any; // 临时占位，实际应从 ABI 文件导入
+// 导入合约 ABI
+const CONTRACT_ABI = LuckyPacketABI as any;
 
 const DAppHome = () => {
   const { address, isConnected } = useAccount();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState('create');
+
+  // 检查 URL 是否包含红包 ID 参数
+  const sharedPacketId = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('packet');
+  }, []);
+
+  // 如果有分享的红包 ID，自动跳转到红包列表页
+  useEffect(() => {
+    if (sharedPacketId && isConnected) {
+      setActiveTab('list');
+    }
+  }, [sharedPacketId, isConnected]);
 
   const handlePacketCreated = () => {
-    // 红包创建成功后，触发列表刷新
+    // 红包创建成功后，触发列表刷新并跳转到红包列表
     setRefreshTrigger(prev => prev + 1);
+    setActiveTab('list');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Toaster position="top-right" />
-      
       {/* Header */}
       <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -113,7 +126,7 @@ const DAppHome = () => {
           </Card>
         ) : (
           /* Connected State - Main App */
-          <Tabs defaultValue="create" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
               <TabsTrigger value="create" className="gap-2">
                 <PlusCircle className="h-4 w-4" />
@@ -160,9 +173,14 @@ const DAppHome = () => {
                   </div>
                   <div className="flex gap-2">
                     <span className="font-semibold text-blue-600">5.</span>
-                    <p>确认交易，等待上链完成</p>
+                    <p>确认交易，创建成功后分享链接给朋友</p>
                   </div>
-                  <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950 rounded-lg">
+                  <div className="mt-4 p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+                    <p className="text-xs text-green-800 dark:text-green-200">
+                      🔒 <strong>私密红包：</strong>您创建的红包只有通过分享链接才能被他人看到和领取，不会公开显示。
+                    </p>
+                  </div>
+                  <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-950 rounded-lg">
                     <p className="text-xs text-amber-800 dark:text-amber-200">
                       💡 <strong>提示：</strong>创建红包将收取 1% 的平台手续费，用于维护和开发。
                     </p>

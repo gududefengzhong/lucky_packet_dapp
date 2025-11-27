@@ -1,146 +1,120 @@
-# Welcome to your DApp project
+# 🧧 Lucky Packet DApp - 链上红包
 
-## Project info
+**BNB Hackathon 项目** - 使用 AI (Nora) 构建的链上红包应用
 
-This is a modern Web3 DApp built with:
-- **React** + **TypeScript** + **Vite** for the frontend
-- **Wagmi** for Web3 React hooks
-- **RainbowKit** for beautiful wallet connection UI
-- **shadcn/ui** + **Tailwind CSS** for modern UI components
-- **@tanstack/react-query** for data fetching
+[![BSC Testnet](https://img.shields.io/badge/Network-BSC%20Testnet-yellow)](https://testnet.bscscan.com/address/0x62B8d5497CCf812A6d82Ef047F9bDae39e24bb03)
 
-## Features
+## ✨ 功能特性
 
-- 🔗 **Wallet Connection**: Connect to multiple wallets with RainbowKit
-- 🌐 **Multi-chain Support**: Ethereum, Polygon, Optimism, Arbitrum, Base, and more
-- 📊 **Real-time Data**: Live blockchain data with automatic updates
-- 🎨 **Modern UI**: Beautiful components with shadcn/ui and Tailwind CSS
-- 🔒 **Type Safety**: Full TypeScript support for Web3 development
-- 📱 **Responsive Design**: Works perfectly on desktop and mobile
+- 🎁 **创建红包** - 设置金额、份数、过期时间和祝福语
+- 🎲 **两种模式** - 拼手气（随机金额）或 固定金额
+- 🔗 **一键分享** - 生成链接分享到 X (Twitter)
+- 💰 **链上领取** - 朋友打开链接即可领取 BNB
+- 📊 **透明记录** - 所有红包和领取记录全链上可查
+- ⏰ **过期退款** - 未领完的红包可由创建者退回
 
-## Getting Started
+## 🛠 技术栈
 
-### 1. Configure WalletConnect
+**智能合约:**
+- Solidity 0.8.20
+- Foundry (开发、测试、部署)
+- OpenZeppelin (ReentrancyGuard, Ownable)
 
-Before running the app, you need to get a WalletConnect Project ID:
+**前端:**
+- React 18 + TypeScript + Vite
+- Wagmi v2 + Viem (Web3 交互)
+- RainbowKit (钱包连接)
+- shadcn/ui + Tailwind CSS (UI)
 
-1. Go to [WalletConnect Cloud](https://cloud.walletconnect.com)
-2. Create a new project
-3. Copy your Project ID
-4. Update `src/wagmi.ts` and replace `YOUR_PROJECT_ID` with your actual Project ID
+**网络:**
+- BSC Testnet (Chain ID: 97)
 
-```typescript
-export const config = getDefaultConfig({
-  appName: 'My DApp',
-  projectId: 'your-actual-project-id-here', // Replace this
-  chains: [mainnet, polygon, optimism, arbitrum, base, sepolia],
-  ssr: false,
-});
-```
+## 🚀 快速开始
 
+### 1. 克隆项目
 
-### 2. Install Dependencies and Run
-
-```sh
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-│   └── ui/             # shadcn/ui components
-├── pages/              # Page components
-│   ├── DAppHome.tsx    # Main DApp page
-│   └── NotFound.tsx    # 404 page
-├── wagmi.ts            # Wagmi configuration
-├── App.tsx             # Main app component
-└── main.tsx            # App entry point
-```
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Nora.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
 git clone <YOUR_GIT_URL>
+cd lucky_packet_dapp
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 2. 安装依赖
 
-# Step 3: Install the necessary dependencies.
-npm i
+```bash
+npm install
+```
 
-# Step 4: Configure WalletConnect Project ID in src/wagmi.ts
+### 3. 配置环境变量
 
-# Step 5: Start the development server with auto-reloading and an instant preview.
+```bash
+cp .env.example .env
+```
+
+编辑 `.env` 文件：
+```env
+VITE_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
+VITE_LUCKY_PACKET_CONTRACT_ADDRESS=0x62B8d5497CCf812A6d82Ef047F9bDae39e24bb03
+```
+
+> 获取 WalletConnect Project ID: [WalletConnect Cloud](https://cloud.walletconnect.com)
+
+### 4. 启动开发服务器
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+访问 http://localhost:5173
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📁 项目结构
 
-**Use GitHub Codespaces**
+```
+├── contracts/              # Solidity 智能合约
+│   ├── src/
+│   │   └── LuckyPacket.sol
+│   ├── script/
+│   │   └── Deploy.s.sol
+│   └── test/
+│       └── LuckyPacket.t.sol
+├── src/
+│   ├── components/         # React 组件
+│   │   ├── CreatePacketForm.tsx
+│   │   ├── ClaimPacketCard.tsx
+│   │   └── MyPackets.tsx
+│   ├── contracts/abis/     # 合约 ABI
+│   ├── pages/
+│   └── wagmi.ts           # Web3 配置
+└── README.md
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📜 合约信息
 
-## What technologies are used for this project?
+| 网络 | 合约地址 |
+|------|----------|
+| BSC Testnet | [`0x62B8d5497CCf812A6d82Ef047F9bDae39e24bb03`](https://testnet.bscscan.com/address/0x62B8d5497CCf812A6d82Ef047F9bDae39e24bb03) |
 
-This project is built with:
+**合约功能:**
+- `createPacket()` - 创建红包
+- `claimPacket()` - 领取红包
+- `refundPacket()` - 退回过期红包
+- `getPacketInfo()` - 查询红包信息
+- 平台手续费: 1%
 
-**Frontend Framework:**
-- **Vite** - Fast build tool and dev server
-- **React** - UI library
-- **TypeScript** - Type safety
+## 🔧 合约开发
 
-**Web3 Stack:**
-- **Wagmi** - React hooks for Ethereum
-- **RainbowKit** - Wallet connection UI
-- **Viem** - TypeScript interface for Ethereum
+```bash
+cd contracts
 
-**UI & Styling:**
-- **shadcn/ui** - Modern UI components
-- **Tailwind CSS** - Utility-first CSS framework
-- **Radix UI** - Unstyled, accessible UI primitives
+# 编译
+forge build
 
-**Data Fetching:**
-- **@tanstack/react-query** - Data fetching and caching
+# 测试
+forge test -vvv
 
-## Next Steps
+# 部署 (需配置私钥)
+forge script script/Deploy.s.sol --rpc-url <RPC_URL> --broadcast
+```
 
-1. **Configure WalletConnect**: Get your Project ID from [WalletConnect Cloud](https://cloud.walletconnect.com)
-2. **Customize Chains**: Modify the supported chains in `src/wagmi.ts`
-3. **Add Smart Contract Integration**: Use Wagmi hooks to interact with your contracts
-4. **Customize UI**: Modify components in `src/pages/DAppHome.tsx`
-5. **Add More Pages**: Create additional pages for your DApp features
+## 📄 License
 
-## Resources
-
-- [Wagmi Documentation](https://wagmi.sh)
-- [RainbowKit Documentation](https://rainbowkit.com)
-- [shadcn/ui Documentation](https://ui.shadcn.com)
-- [Viem Documentation](https://viem.sh)
-- [React Documentation](https://react.dev)
+MIT

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatEther } from 'viem';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { Card, CardContent, CardFooter, CardHeader } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
-import { Gift, Clock, Users, Loader2, TrendingUp } from 'lucide-react';
+import { Gift, Clock, Users, Loader2, TrendingUp, Copy, Check } from 'lucide-react';
+import { FaXTwitter } from 'react-icons/fa6';
 
 interface PacketData {
   id: bigint;
@@ -27,23 +28,60 @@ interface ClaimPacketCardProps {
   contractABI: any;
   hasClaimed?: boolean;
   onSuccess?: () => void;
+  isCreator?: boolean; // 是否是从"我创建的"页面显示
 }
 
-export function ClaimPacketCard({ 
-  packet, 
-  contractAddress, 
-  contractABI, 
+export function ClaimPacketCard({
+  packet,
+  contractAddress,
+  contractABI,
   hasClaimed = false,
-  onSuccess 
+  onSuccess,
+  isCreator = false
 }: ClaimPacketCardProps) {
   const { address } = useAccount();
   const [isClaiming, setIsClaiming] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const { writeContract, data: hash, isPending } = useWriteContract();
+
+  // 生成分享链接
+  const shareLink = `${window.location.origin}?packet=${packet.id.toString()}`;
+
+  // 复制分享链接
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setIsCopied(true);
+      toast.success('链接已复制到剪贴板！');
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      toast.error('复制失败，请手动复制');
+    }
+  };
+
+  // 分享到 X (Twitter)
+  const handleShareToX = () => {
+    const shareText = packet.message
+      ? `🧧 ${packet.message} - 快来领取链上红包！`
+      : '🧧 有人给你发了一个链上红包，快来领取！';
+
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareLink)}`;
+    window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+  };
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  // 使用 useEffect 处理交易成功的副作用
+  useEffect(() => {
+    if (isSuccess && isClaiming) {
+      toast.success('🎉 恭喜！红包领取成功！');
+      setIsClaiming(false);
+      onSuccess?.();
+    }
+  }, [isSuccess, isClaiming, onSuccess]);
 
   const handleClaim = async () => {
     if (!address) {
@@ -78,13 +116,6 @@ export function ClaimPacketCard({
       setIsClaiming(false);
     }
   };
-
-  // 监听交易成功
-  if (isSuccess && isClaiming) {
-    toast.success('🎉 恭喜！红包领取成功！');
-    setIsClaiming(false);
-    onSuccess?.();
-  }
 
   // 计算剩余百分比
   const remainingPercent = Number(packet.remainingCount) / Number(packet.totalCount) * 100;
@@ -172,13 +203,13 @@ export function ClaimPacketCard({
             <div>
               <p className="text-sm text-muted-foreground">总金额</p>
               <p className="text-lg font-bold text-red-600">
-                {formatEther(packet.totalAmount)} BNB
+                {parseFloat(formatEther(packet.totalAmount)).toPrecision(4)} BNB
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">剩余金额</p>
               <p className="text-lg font-bold text-orange-600">
-                {formatEther(packet.remainingAmount)} BNB
+                {parseFloat(formatEther(packet.remainingAmount)).toPrecision(4)} BNB
               </p>
             </div>
           </div>
@@ -240,7 +271,8 @@ export function ClaimPacketCard({
         )}
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-2">
+        {/* 领取按钮 */}
         <Button
           onClick={handleClaim}
           disabled={!canClaim || isPending || isConfirming || isClaiming}
@@ -270,6 +302,33 @@ export function ClaimPacketCard({
             </>
           )}
         </Button>
+
+        {/* 分享按钮 - 创建者始终可见，或红包仍可领取时显示 */}
+        {isCreator || (!isExpired && !isCompleted) ? (
+          <div className="flex w-full gap-2">
+            <Button
+              onClick={handleShareToX}
+              variant="outline"
+              className="flex-1"
+              size="sm"
+            >
+              <FaXTwitter className="mr-2 h-4 w-4" />
+              分享到 X
+            </Button>
+            <Button
+              onClick={handleCopyLink}
+              variant="outline"
+              size="sm"
+              title="复制链接"
+            >
+              {isCopied ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        ) : null}
       </CardFooter>
     </Card>
   );

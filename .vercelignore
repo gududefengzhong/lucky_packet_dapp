@@ -1,0 +1,25 @@
+# 私钥和敏感信息 - 不要上传到 Vercel
+.env
+.env.local
+.env.*.local
+
+# Foundry 合约相关 - 不需要在 Vercel 上
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+foundry.toml
+foundry.lock
+
+# 开发工具
+.vscode/
+.idea/
+
+# 测试文件
+contracts/test/
+
+# 部署脚本（包含私钥引用）
+contracts/script/
+
+# Git 相关
+.git/
+.gitignore

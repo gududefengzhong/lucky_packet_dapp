@@ -1,18 +1,10 @@
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
+import LuckyPacketABI from '../contracts/abis/LuckyPacket.json';
 
 // 合约地址和 ABI 配置
 const CONTRACT_ADDRESS = import.meta.env.VITE_LUCKY_PACKET_CONTRACT_ADDRESS as `0x${string}`;
-
-// 导入合约 ABI (部署后从 src/contracts/abis/LuckyPacket.json 导入)
-let CONTRACT_ABI: any = [];
-try {
-  // 动态导入 ABI
-  const abiModule = await import('../contracts/abis/LuckyPacket.json');
-  CONTRACT_ABI = abiModule.default;
-} catch (error) {
-  console.warn('Contract ABI not found. Please compile and extract ABIs first.');
-}
+const CONTRACT_ABI = LuckyPacketABI as any;
 
 /**
  * 红包数据类型
